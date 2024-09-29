@@ -3,7 +3,6 @@
 import fs from 'fs';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
 import Cors from 'cors';
 
 const cors = Cors({
