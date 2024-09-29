@@ -1,13 +1,13 @@
 import fetch from 'node-fetch';
 
 interface ProjectFile {
-  dir: string;    // File path (e.g., 'src/index.ts')
-  content: string;  // File content
+  dir: string; // File path (e.g., 'src/index.ts')
+  content: string; // File content
 }
 
 interface ProjectData {
-  name: string;     // Repository name
-  files: ProjectFile[];  // Array of files to be uploaded
+  name: string; // Repository name
+  files: ProjectFile[]; // Array of files to be uploaded
 }
 
 const GITHUB_API_BASE = 'https://api.github.com';
@@ -22,13 +22,12 @@ export async function createGithubRepo(accessToken: string, projectData: Project
     },
     body: JSON.stringify({
       name: projectData.name,
-      private: false,  // Set to 'true' if you want private repos
+      private: false, // Set to 'true' if you want private repos
       auto_init: false, // We'll upload our own files
     }),
   });
 
   const repoJson = await repoResponse.json();
-
   if (!repoResponse.ok) {
     throw new Error(`GitHub API error: ${repoJson.message}`);
   }
@@ -52,7 +51,6 @@ async function uploadFileToGithubRepo(
   fileContent: string
 ) {
   const contentBase64 = Buffer.from(fileContent).toString('base64');
-
   const response = await fetch(`${GITHUB_API_BASE}/repos/${repoName}/contents/${filePath}`, {
     method: 'PUT',
     headers: {

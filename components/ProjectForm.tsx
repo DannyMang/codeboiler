@@ -1,3 +1,5 @@
+import { Send } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -7,13 +9,44 @@ const ProjectForm = () => {
   const [projectData, setProjectData] = useState(null);
   const [repoUrl, setRepoUrl] = useState('');
 
+interface Message {
+  text: string;
+  sender: 'user' | 'ai';
+}
+
+interface ProjectData {
+  name: string;
+  files: { dir: string; content: string }[];
+}
+
+const ProjectForm: React.FC = () => {
+  const { data: session } = useSession();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [prompt, setPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+  const [repoUrl, setRepoUrl] = useState('');
+
+  const handleSendMessage = () => {
+    if (input.trim()) {
+      setMessages(prevMessages => [...prevMessages, { text: input, sender: 'user' }]);
+      setInput('');
+      // Simulate AI response (replace with actual API call)
+      setTimeout(() => {
+        setMessages(prevMessages => [...prevMessages, { text: "This is a simulated AI response.", sender: 'ai' }]);
+      }, 1000);
+    }
+  };
+>>>>>>> cec41239da7cf3aca771fef2fccc6a97db5ad5ad
+
   const handleGenerateProject = async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/generateProject', {
         method: 'POST',
         body: JSON.stringify({ prompt }),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }
       });
       const data = await response.json();
       setProjectData(data);

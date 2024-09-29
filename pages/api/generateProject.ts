@@ -1,6 +1,9 @@
+// pages/api/generateProject.ts
+
 import fs from 'fs';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/react';
 import Cors from 'cors';
 
 const cors = Cors({
@@ -12,6 +15,13 @@ interface FileData {
   dir: string;
   content: string;
 }
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getSession({ req });
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
 
 // Helper function to run middleware
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -26,7 +36,6 @@ function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) 
   });
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Run the CORS middleware
   await runMiddleware(req, res, cors);
 
@@ -57,6 +66,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   res.status(200).json(finalFiles);
 }
+
+// Helper functions (readDirectoryFiles and combineFiles) remain the same
 
 async function readDirectoryFiles(dirPath: string): Promise<FileData[]> {
   const files: FileData[] = [];
