@@ -52,11 +52,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       messages: [
         {"role": "user", "content": `Generate code for a React project based on: ${prompt}. 
         You can modify "package.json" to include any necessary dependencies and "index.ts" for the main entry point. 
-        Return a JSON response like this: [ { "dir": "src/components/ComponentName.js", "content": "import React...component code" }, 
+        Return a valid JSON object like this, without any text before or after the object: [ { "dir": "src/components/ComponentName.js", "content": "import React...component code" }, 
         { "dir": "package.json", "content": "updated package.json" } ]`}
       ],
       model: 'claude-3-opus-20240229',
-      max_tokens: 1000
+      max_tokens: 4096
     })
   });
   const generatedFiles: FileData[] = await aiResponse.json();
@@ -69,9 +69,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const endIdx = responseText.lastIndexOf(']') + 1;
 
   // Extract the JSON string
-  const jsonString = responseText.slice(startIdx, endIdx);
+  let jsonString = responseText.slice(startIdx, endIdx);
 
-  // Parse the JSON string
   const jsonObject = JSON.parse(jsonString);
 
   // Read base template files
