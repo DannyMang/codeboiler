@@ -181,9 +181,13 @@ const ProjectForm: React.FC = () => {
       {/* Editor Modal */}
       {showEditor && (
         <EditorModal
-          projectData={projectData}
-          onClose={() => setShowEditor(false)}
-        />
+        projectData={projectData}
+        onClose={(updatedProjectData) => {
+          setProjectData(updatedProjectData);
+          setShowEditor(false); // Close modal after saving changes
+        }}
+      />
+      
       )}
     </>
   );

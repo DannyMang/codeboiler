@@ -53,27 +53,31 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="bg-white rounded-lg justify-between w-4/5 h-4/5 shadow-lg flex">
-        <Sidebar
-          files={localProjectData}
-          onSelectFile={(file) => setSelectedFile(file)}
-        />
-        <div className="flex flex-col w-full p-4">
-          {selectedFile && (
-           <CodeEditor
-           key={selectedFile?.dir} // Add a key to force re-render on file change
-           fileContent={selectedFile?.content || ''}
-           onChange={handleFileChange}
-         />
-          )}
-        </div>
-      </div>
-      <button
-        className="top-2 right-2 p-2 bg-red-500 text-white rounded-full"
-        onClick={handleClose}
-      >
-        Close
-      </button>
+     <div className="bg-white rounded-lg w-full h-full max-w-6xl flex flex-row">
+  <Sidebar
+    files={localProjectData}
+    onSelectFile={handleSelectFile}
+  />
+  <div className="flex-grow p-4 overflow-auto">
+    {selectedFile ? (
+      <CodeEditor
+        key={selectedFile?.dir}
+        fileContent={selectedFile?.content || ""}
+        onChange={handleFileChange}
+      />
+    ) : (
+      <p>Select a file to start editing</p>
+    )}
+  </div>
+</div>
+
+<button
+  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full"
+  onClick={handleClose} // Save changes on close
+>
+  Close
+</button>
+
     </motion.div>
   );
 };
