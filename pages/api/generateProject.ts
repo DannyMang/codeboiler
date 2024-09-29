@@ -1,15 +1,24 @@
 import fs from 'fs';
 import path from 'path';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { prompt } = req.body;
 
   // Call AI API to generate files
-  const aiResponse = await fetch('YOUR_AI_API_URL', {
+  const aiResponse = await fetch('https://api.anthropic.com/v1/complete', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': process.env.CLAUDE_API_KEY || ''
+    },
+    body: JSON.stringify({
+      prompt,
+      model: 'claude-v1',
+      max_tokens_to_sample: 1000
+    })
   });
+  
   const generatedFiles = await aiResponse.json();
 
   // Read base template files
@@ -22,7 +31,7 @@ export default async function handler(req, res) {
   res.status(200).json(finalFiles);
 }
 
-async function readDirectoryFiles(dirPath) {
+async function readDirectoryFiles(dirPath: string): Promise<{ dir: string, content: string }[]> {
   const files = [];
   const filesInDir = fs.readdirSync(dirPath);
 
