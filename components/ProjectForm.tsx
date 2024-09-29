@@ -1,4 +1,5 @@
-import { useUser } from '@clerk/nextjs';
+import { Send } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -8,7 +9,9 @@ interface ProjectData {
 }
 
 const ProjectForm: React.FC = () => {
-  const { user, getToken } = useUser(); // Get user data and token function from Clerk
+  const { data: session } = useSession(); // Call useSession once at the top
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
