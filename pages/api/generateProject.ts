@@ -60,14 +60,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   });
   const generatedFiles: FileData[] = await aiResponse.json();
-  console.log(generatedFiles);
+  
+  // Extract the text content
+  const responseText = generatedFiles.content[0].text;
+
+  // Find the start and end indices of the JSON array
+  const startIdx = responseText.indexOf('[');
+  const endIdx = responseText.lastIndexOf(']') + 1;
+
+  // Extract the JSON string
+  const jsonString = responseText.slice(startIdx, endIdx);
+
+  // Parse the JSON string
+  const jsonObject = JSON.parse(jsonString);
 
   // Read base template files
   const basePath = path.join(process.cwd(), 'public/basic-react-template');
   const baseFiles = await readDirectoryFiles(basePath);
 
   // Combine base files with AI-generated files (overwriting base with generated if applicable)
-  const finalFiles = combineFiles(baseFiles, generatedFiles);
+  const finalFiles = combineFiles(baseFiles, jsonObject);
 
   res.status(200).json(finalFiles);
 }
@@ -112,5 +124,6 @@ function combineFiles(baseFiles: FileData[], generatedFiles: FileData[]): FileDa
     }
   }
   
+  console.log(finalFiles);
   return finalFiles;
 }
