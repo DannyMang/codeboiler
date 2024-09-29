@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+interface FileData {
+  dir: string;
+  content: string;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { prompt } = req.body;
 
@@ -13,26 +18,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       'X-API-Key': process.env.CLAUDE_API_KEY || ''
     },
     body: JSON.stringify({
-      prompt,
+      prompt: `Generate code for a React project based on: ${prompt}. 
+      You can modify "package.json" to include any necessary dependencies and "index.ts" for the main entry point. 
+      Return a JSON response like this: [ { "dir": "src/components/ComponentName.js", "content": "import React...component code" }, { "dir": "package.json", "content": "updated package.json" } ]`,
       model: 'claude-v1',
       max_tokens_to_sample: 1000
     })
   });
-  
-  const generatedFiles = await aiResponse.json();
+  const generatedFiles: FileData[] = await aiResponse.json();
 
   // Read base template files
   const basePath = path.join(process.cwd(), 'public/basic-react-template');
   const baseFiles = await readDirectoryFiles(basePath);
 
-  // Combine base files with AI-generated files
-  const finalFiles = [...baseFiles, ...generatedFiles];
+  // Combine base files with AI-generated files (overwriting base with generated if applicable)
+  const finalFiles = combineFiles(baseFiles, generatedFiles);
 
   res.status(200).json(finalFiles);
 }
 
-async function readDirectoryFiles(dirPath: string): Promise<{ dir: string, content: string }[]> {
-  const files = [];
+async function readDirectoryFiles(dirPath: string): Promise<FileData[]> {
+  const files: FileData[] = [];
   const filesInDir = fs.readdirSync(dirPath);
 
   for (const file of filesInDir) {
@@ -51,4 +57,23 @@ async function readDirectoryFiles(dirPath: string): Promise<{ dir: string, conte
   }
 
   return files;
+}
+
+// Helper to combine base files with AI-generated files
+function combineFiles(baseFiles: FileData[], generatedFiles: FileData[]): FileData[] {
+  const finalFiles = [...baseFiles];
+  
+  for (const generatedFile of generatedFiles) {
+    const existingFileIndex = finalFiles.findIndex(file => file.dir === generatedFile.dir);
+    
+    if (existingFileIndex !== -1) {
+      // Replace the base file with the AI-generated file if it already exists
+      finalFiles[existingFileIndex] = generatedFile;
+    } else {
+      // Otherwise, just add the new AI-generated file
+      finalFiles.push(generatedFile);
+    }
+  }
+  
+  return finalFiles;
 }
