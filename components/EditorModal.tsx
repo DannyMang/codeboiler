@@ -13,36 +13,11 @@ interface EditorModalProps {
 const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
   const [localProjectData, setLocalProjectData] = useState(projectData);
   const [selectedFile, setSelectedFile] = useState<{ dir: string; content: string; } | null>(
-    projectData && projectData.length > 0 ? projectData[0] : null
+    null
   );
 
-  useEffect(() => {
-    if (localProjectData && localProjectData.length > 0) {
-      setSelectedFile(localProjectData[0]);
-    }
-  }, [localProjectData]);
-
   // When selecting a file from the sidebar
-  const handleSelectFile = (file: { dir: string; content: string; }) => {
-    setSelectedFile(file);
-    console.log("Selected new file:", file);
-  };
-
-  const handleFileChange = (newContent: string) => {
-    if (selectedFile && localProjectData) {
-      const updatedFile = { ...selectedFile, content: newContent };
-      setSelectedFile(updatedFile);
-
-      const updatedProjectData = localProjectData.map(file =>
-        file.dir === updatedFile.dir ? updatedFile : file
-      );
-      setLocalProjectData(updatedProjectData);
-
-      console.log("Updated file:", updatedFile);
-      console.log("Updated project data:", updatedProjectData);
-    }
-  };
-
+ 
   const handleClose = () => {
     onClose(localProjectData);
   };
@@ -55,7 +30,6 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
     // Simple check for binary content (you might want to improve this)
     return /[\x00-\x08\x0E-\x1F]/.test(content);
   };
-
   return (
     <motion.div
       className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
@@ -79,14 +53,24 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
               </div>
             ) : (
               <CodeEditor
-                fileContent={selectedFile.content}
-                onChange={(newContent) => {
-                  setSelectedFile({ ...selectedFile, content: newContent });
-                }}
-                filename={selectedFile.dir}
-              />
+  fileContent={selectedFile.content}
+  onChange={(newContent) => {
+    console.log(selectedFile)
+    const updatedFile = { ...selectedFile, content: newContent };
+    console.log(updatedFile)
+    setSelectedFile(updatedFile);
+    
+    // Update localProjectData
+    setLocalProjectData(prevData => 
+      prevData.map(file => 
+        file.dir === updatedFile.dir ? updatedFile : file
+      )
+    );
+  }}
+  filename={selectedFile.dir}
+/>
             )
-          )}
+          )} 
         </div>
         <button
           className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full"

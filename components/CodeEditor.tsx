@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const CodeMirror = dynamic(
-  () => {
+  async () => {
     import("codemirror/lib/codemirror.css");
     import("codemirror/theme/material.css");
     import("codemirror/mode/javascript/javascript");
     import("codemirror/mode/css/css");
     import("codemirror/mode/htmlmixed/htmlmixed");
-    return import("react-codemirror2").then((mod) => mod.Controlled);
+    const mod = await import("react-codemirror2");
+    return mod.Controlled;
   },
   { ssr: false }
 );
