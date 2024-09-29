@@ -65,68 +65,42 @@ const ProjectForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-gray-300">
-      <header className="p-4 border-b border-gray-700">
-        <h1 className="text-xl font-semibold">Project Generator</h1>
-        {session && <p>Signed in as {session.user?.name}</p>}
-      </header>
-      
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg p-3 ${
-              message.sender === 'user' ? 'bg-blue-600' : 'bg-gray-700'
-            }`}>
-              {message.text}
-            </div>
-          </div>
-        ))}
+    <div className="flex items-center justify-center flex-row w-full min-h-screen">
+      <div className="flex flex-col space-y-4 items-center w-1/2">
+        <h1 className="text-6xl text-white text-center">CodeBoiler</h1>
+        <h2 className="text-2xl text-white text-center">yo we boilin'</h2>
+      <input
+        type="text"
+        placeholder="Describe your project..."
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        className="input-prompt text-gray-300 w-full bg-transparent p-4 "
+      />
+      <button 
+        onClick={handleGenerateProject} 
+        disabled={isLoading || !prompt}
+        className=" mt-8 p-3 rounded-full text-black cursor-pointer w-1/2 bg-gray-300 "
+      >
+        {isLoading ? 'Generating...' : 'Generate Project'}
+      </button>
+
       </div>
 
-      <div className="p-4 border-t border-gray-700">
-        <div className="flex items-center bg-gray-800 rounded-lg">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Message ChatGPT..."
-            className="flex-grow p-3 bg-transparent outline-none"
-          />
-          <button onClick={handleSendMessage} className="p-3 text-gray-400 hover:text-white">
-            <Send size={20} />
-          </button>
-        </div>
-        <input
-          type="text"
-          placeholder="Describe your project..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          className="mt-4 p-2 w-full bg-gray-800 rounded-md"
-        />
-        <button
-          onClick={handleGenerateProject}
-          disabled={isLoading || !prompt}
-          className="mt-4 p-2 bg-blue-600 rounded-md disabled:bg-blue-400"
-        >
-          {isLoading ? 'Generating...' : 'Generate Project'}
-        </button>
-        {projectData && (
-          <button
-            onClick={handleExportToGithub}
-            className="mt-4 ml-4 p-2 bg-green-600 rounded-md"
-          >
+      {/* Display the export button only if projectData is available */}
+      {projectData && (
+        <div className="export-section">
+          <button onClick={handleExportToGithub} className="export-btn">
             Export to GitHub
           </button>
-        )}
-        {repoUrl && (
-          <div className="mt-4">
-            <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-              View created repository
-            </a>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Display the GitHub repo URL once it's available */}
+      {repoUrl && (
+        <div className="repo-section">
+          <p>Repository created: <a href={repoUrl} target="_blank" rel="noopener noreferrer">{repoUrl}</a></p>
+        </div>
+      )}
     </div>
   );
 };

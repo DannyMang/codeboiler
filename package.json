@@ -11,14 +11,21 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
+    "anthropic-ai": "^0.0.10",
+    "axios": "^1.7.7",
+    "commander": "^12.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "inquirer": "^11.1.0",
     "lucide-react": "^0.446.0",
     "next": "^14.2.13",
     "next-auth": "^4.24.8",
+    "open": "^10.1.0",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^20.16.10",
     "@types/react": "^18",
