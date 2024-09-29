@@ -43,21 +43,26 @@ const ProjectForm = () => {
   };
 
   return (
-    <div className="project-form-container">
+    <div className="flex items-center justify-center flex-row w-full min-h-screen">
+      <div className="flex flex-col space-y-4 items-center w-1/2">
+        <h1 className="text-6xl text-white text-center">CodeBoiler</h1>
+        <h2 className="text-2xl text-white text-center">yo we boilin'</h2>
       <input
         type="text"
         placeholder="Describe your project..."
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        className="input-prompt"
+        className="input-prompt text-gray-300 w-full bg-transparent p-4 "
       />
       <button 
         onClick={handleGenerateProject} 
         disabled={isLoading || !prompt}
-        className="generate-btn"
+        className=" mt-8 p-3 rounded-full text-black cursor-pointer w-1/2 bg-gray-300 "
       >
         {isLoading ? 'Generating...' : 'Generate Project'}
       </button>
+
+      </div>
 
       {/* Display the export button only if projectData is available */}
       {projectData && (
