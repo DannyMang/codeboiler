@@ -1,26 +1,21 @@
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import ProjectForm from "../components/ProjectForm";
-import LoginPage from './login';
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { isSignedIn, isLoaded } = useUser(); // Get user session status from Clerk
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
+    // If the user is not signed in, redirect to the login page
+    if (isLoaded && !isSignedIn) {
+      window.location.href = '/login'; // Redirect to login page
     }
-  }, [status, router]);
+  }, [isLoaded, isSignedIn]);
 
-  if (status === 'loading') {
-    return <div>Loading...</div>;
+  if (!isLoaded) {
+    return <div>Loading...</div>; // Show loading while checking session
   }
 
-  if (!session) {
-    return LoginPage;
-  }
-
+  // Render the ProjectForm if the user is signed in
   return <ProjectForm />;
 }

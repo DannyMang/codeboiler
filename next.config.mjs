@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    CLERK_FRONTEND_API: process.env.CLERK_FRONTEND_API,
+    CLERK_API_KEY: process.env.CLERK_API_KEY,
   },
 };
 

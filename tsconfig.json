@@ -18,7 +18,9 @@
     "moduleResolution": "node",  // Added this line
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+        "typeRoots": ["./node_modules/@types", "./types"]
+
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/GitHubLoginButton.js", "components/ProjectForm.js", "components/ProjectForm.js"],
   "exclude": ["node_modules"]

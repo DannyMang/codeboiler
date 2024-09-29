@@ -1,12 +1,19 @@
-import "@/styles/globals.css";
-import { SessionProvider } from 'next-auth/react';
-import type { AppProps } from 'next/app';
+import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
+import { AppProps } from 'next/app'; // Import AppProps type
+import '../styles/globals.css';
 
-function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <ClerkProvider>
+      <SignedIn>
+        {/* Render your authenticated application here */}
+        <Component {...pageProps} />
+      </SignedIn>
+      <SignedOut>
+        {/* Render your sign-in or sign-up page */}
+        <RedirectToSignIn />
+      </SignedOut>
+    </ClerkProvider>
   );
 }
 

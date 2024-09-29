@@ -1,12 +1,6 @@
-import { Send } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-
-interface Message {
-  text: string;
-  sender: 'user' | 'ai';
-}
 
 interface ProjectData {
   name: string;
@@ -14,30 +8,11 @@ interface ProjectData {
 }
 
 const ProjectForm: React.FC = () => {
-  const { data: session } = useSession(); // Call useSession once at the top
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const { user, getToken } = useUser(); // Get user data and token function from Clerk
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [repoUrl, setRepoUrl] = useState('');
-
-  const handleSendMessage = () => {
-    if (input.trim()) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, sender: 'user' },
-      ]);
-      setInput('');
-      // Simulate AI response (replace with actual API call)
-      setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: 'This is a simulated AI response.', sender: 'ai' },
-        ]);
-      }, 1000);
-    }
-  };
 
   const handleGenerateProject = async () => {
     setIsLoading(true);
@@ -58,19 +33,22 @@ const ProjectForm: React.FC = () => {
   const handleExportToGithub = async () => {
     setIsLoading(true);
 
-    if (!session || !session.accessToken) {
-      console.error('No access token available');
+    // Check if user is signed in
+    if (!user) {
+      console.error('User is not signed in');
       setIsLoading(false);
       return;
     }
 
     try {
+      // Get the access token for GitHub
+      const accessToken = await getToken({ template: 'github' }); // Assuming 'github' is the template you use for GitHub access
+
       const response = await fetch('/api/exportToGithub', {
         method: 'POST',
-        body: JSON.stringify({ projectData }),
+        body: JSON.stringify({ projectData, accessToken }),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`, // Use session here
         },
       });
 
@@ -83,20 +61,24 @@ const ProjectForm: React.FC = () => {
     setIsLoading(false);
   };
 
+  if (!user) {
+    return <div>Please sign in to use the project generator.</div>; // Prompt to sign in
+  }
+
   return (
-    <motion.div
+    <motion.div 
       className="flex items-center justify-center flex-col w-full min-h-screen bg-gradient-to-br from-purple-600 to-blue-500"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.div
+      <motion.div 
         className="flex flex-col space-y-6 items-center w-full max-w-md p-8 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-lg"
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <motion.h1
+        <motion.h1 
           className="text-6xl font-bold text-white text-center"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -104,13 +86,13 @@ const ProjectForm: React.FC = () => {
         >
           CodeBoiler
         </motion.h1>
-        <motion.h2
+        <motion.h2 
           className="text-2xl text-white text-center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
-          yo we boilin'
+          yo we boilin&apos;
         </motion.h2>
         <motion.input
           type="text"
@@ -122,8 +104,8 @@ const ProjectForm: React.FC = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.5 }}
         />
-        <motion.button
-          onClick={handleGenerateProject}
+        <motion.button 
+          onClick={handleGenerateProject} 
           disabled={isLoading || !prompt}
           className="mt-4 p-3 rounded-full text-white cursor-pointer w-full bg-purple-500 hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           whileHover={{ scale: 1.05 }}
@@ -137,14 +119,14 @@ const ProjectForm: React.FC = () => {
       </motion.div>
 
       {projectData && (
-        <motion.div
+        <motion.div 
           className="export-section mt-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <motion.button
-            onClick={handleExportToGithub}
+          <motion.button 
+            onClick={handleExportToGithub} 
             className="export-btn bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition duration-300 ease-in-out"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -155,23 +137,13 @@ const ProjectForm: React.FC = () => {
       )}
 
       {repoUrl && (
-        <motion.div
+        <motion.div 
           className="repo-section mt-4 text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p>
-            Repository created:{' '}
-            <a
-              href={repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-300 hover:text-blue-100 transition"
-            >
-              {repoUrl}
-            </a>
-          </p>
+          <p>Repository created: <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-100 transition">{repoUrl}</a></p>
         </motion.div>
       )}
     </motion.div>
