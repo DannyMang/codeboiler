@@ -38,7 +38,6 @@ const ProjectForm: React.FC = () => {
       }, 1000);
     }
   };
->>>>>>> cec41239da7cf3aca771fef2fccc6a97db5ad5ad
 
   const handleGenerateProject = async () => {
     setIsLoading(true);
