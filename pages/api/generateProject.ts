@@ -1,15 +1,36 @@
 import fs from 'fs';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import Cors from 'cors';
+
+const cors = Cors({
+  methods: ['GET', 'POST', 'OPTIONS'],
+  origin: '*', // Allow all origins (You can restrict this later)
+});
 
 interface FileData {
   dir: string;
   content: string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { prompt } = req.body;
+// Helper function to run middleware
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: unknown) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
 
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Run the CORS middleware
+  await runMiddleware(req, res, cors);
+
+  const { prompt } = req.body;
   // Call AI API to generate files
   const aiResponse = await fetch('https://api.anthropic.com/v1/complete', {
     method: 'POST',
