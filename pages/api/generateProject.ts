@@ -122,6 +122,5 @@ function combineFiles(baseFiles: FileData[], generatedFiles: FileData[]): FileDa
     }
   }
   
-  console.log(finalFiles);
   return finalFiles;
 }
