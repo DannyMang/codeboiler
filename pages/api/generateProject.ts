@@ -1,6 +1,9 @@
+// pages/api/generateProject.ts
+
 import fs from 'fs';
 import path from 'path';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/react';
 
 interface FileData {
   dir: string;
@@ -8,6 +11,11 @@ interface FileData {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getSession({ req });
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const { prompt } = req.body;
 
   // Call AI API to generate files
@@ -36,6 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   res.status(200).json(finalFiles);
 }
+
+// Helper functions (readDirectoryFiles and combineFiles) remain the same
 
 async function readDirectoryFiles(dirPath: string): Promise<FileData[]> {
   const files: FileData[] = [];

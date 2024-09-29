@@ -1,7 +1,15 @@
+// pages/api/exportToGithub.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/react';
 import { createGithubRepo } from '../../utils/github';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getSession({ req });
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const { projectData, accessToken } = req.body;
 
   if (!accessToken) {
