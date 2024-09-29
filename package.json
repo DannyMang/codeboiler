@@ -10,9 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.2.13",
     "@anthropic-ai/sdk": "^0.27.3",
+    "anthropic-ai": "^0.0.10",
     "dotenv": "^16.4.5",
+    "next": "^14.2.13",
     "react": "^18",
     "react-dom": "^18"
   },
