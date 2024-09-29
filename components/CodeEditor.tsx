@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
@@ -9,6 +9,10 @@ interface CodeEditorProps {
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ fileContent, onChange }) => {
+  useEffect(() => {
+    console.log("CodeEditor received new content:", fileContent);
+  }, [fileContent]);
+
   return (
     <CodeMirror
       value={fileContent}
@@ -17,7 +21,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ fileContent, onChange }) => {
         theme: "material",
         lineNumbers: true,
       }}
-      onBeforeChange={(editor, data, value) => onChange(value)}
+      onBeforeChange={(editor, data, value) => {
+        onChange(value);
+        console.log("CodeEditor onChange called with:", value);
+      }}
     />
   );
 };
