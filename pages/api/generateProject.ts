@@ -17,24 +17,24 @@ interface FileData {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req });
-  if (!session) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  // const session = await getSession({ req });
+  // if (!session) {
+  //   return res.status(401).json({ error: 'Unauthorized' });
+  // }
 
 
-// Helper function to run middleware
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: unknown) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
+  // Helper function to run middleware
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) {
+    return new Promise((resolve, reject) => {
+      fn(req, res, (result: unknown) => {
+        if (result instanceof Error) {
+          return reject(result);
+        }
+        return resolve(result);
+      });
     });
-  });
-}
+  }
 
   // Run the CORS middleware
   await runMiddleware(req, res, cors);
@@ -56,6 +56,7 @@ function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) 
     })
   });
   const generatedFiles: FileData[] = await aiResponse.json();
+  console.log(generatedFiles);
 
   // Read base template files
   const basePath = path.join(process.cwd(), 'public/basic-react-template');

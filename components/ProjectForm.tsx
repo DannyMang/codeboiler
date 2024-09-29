@@ -149,5 +149,5 @@ const ProjectForm: React.FC = () => {
     </motion.div>
   );
 };
-}
+
 export default ProjectForm;
