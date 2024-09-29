@@ -1,4 +1,4 @@
-#!/usr/bin/env node --env-file=.env
+#!/usr/bin/env node --env-file=.env --no-warnings
 
 import path from 'path';
 import fs from 'fs';

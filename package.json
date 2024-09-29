@@ -13,6 +13,7 @@
     "@anthropic-ai/sdk": "^0.27.3",
     "@clerk/nextjs": "^5.6.3",
     "@monaco-editor/react": "^4.6.0",
+    "@types/codemirror": "^5.60.15",
     "anthropic-ai": "^0.0.10",
     "axios": "^1.7.7",
     "commander": "^12.1.0",

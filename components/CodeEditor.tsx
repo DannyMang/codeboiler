@@ -1,7 +1,17 @@
 import React, { useEffect } from "react";
-import { Controlled as CodeMirror } from "react-codemirror2";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/material.css";
+import dynamic from "next/dynamic";
+
+const CodeMirror = dynamic(
+  () => {
+    import("codemirror/lib/codemirror.css");
+    import("codemirror/theme/material.css");
+    import("codemirror/mode/javascript/javascript");
+    import("codemirror/mode/css/css");
+    import("codemirror/mode/htmlmixed/htmlmixed");
+    return import("react-codemirror2").then((mod) => mod.Controlled);
+  },
+  { ssr: false }
+);
 
 interface CodeEditorProps {
   fileContent: string;
