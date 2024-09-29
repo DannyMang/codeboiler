@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/router";
+import EditorModal from "./EditorModal"; // New Component
 
 interface ProjectData {
   name: string;
@@ -10,13 +11,15 @@ interface ProjectData {
 }
 
 const ProjectForm: React.FC = () => {
-  const { data: session } = useSession(); // Call useSession once at the top
+  const { data: session } = useSession();
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
+  const [showEditor, setShowEditor] = useState(false); // Modal state for editor
   const accessToken = session.accessToken;
-const router = useRouter()
+  const router = useRouter();
+
   const handleGenerateProject = async () => {
     setIsLoading(true);
     try {
@@ -48,14 +51,13 @@ const router = useRouter()
         body: JSON.stringify({ projectData, accessToken }),
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // Use session here
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
       const { repoUrl } = await response.json();
-
       setRepoUrl(repoUrl);
-      router.push(repoUrl)
+      router.push(repoUrl);
     } catch (error) {
       console.error("Error exporting to GitHub:", error);
     }
@@ -91,14 +93,6 @@ const router = useRouter()
           >
             CodeBoiler
           </motion.h1>
-          <motion.h2
-            className="text-2xl text-white text-center"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            yo we boilin&apos;
-          </motion.h2>
           <motion.input
             type="text"
             placeholder="Describe your project..."
@@ -132,11 +126,13 @@ const router = useRouter()
           >
             Logout
           </motion.button>
+
         </motion.div>
 
+        {/* If projectData exists, show Export and Editor buttons */}
         {projectData && (
           <motion.div
-            className="export-section mt-8"
+            className="export-section mt-8 flex space-x-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -148,6 +144,14 @@ const router = useRouter()
               whileTap={{ scale: 0.95 }}
             >
               Export to GitHub
+            </motion.button>
+            <motion.button
+              onClick={() => setShowEditor(true)} // Show editor modal
+              className="edit-btn bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Edit Project
             </motion.button>
           </motion.div>
         )}
@@ -173,6 +177,14 @@ const router = useRouter()
           </motion.div>
         )}
       </motion.div>
+
+      {/* Editor Modal */}
+      {showEditor && (
+        <EditorModal
+          projectData={projectData}
+          onClose={() => setShowEditor(false)}
+        />
+      )}
     </>
   );
 };
