@@ -41,18 +41,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { prompt } = req.body;
   // Call AI API to generate files
-  const aiResponse = await fetch('https://api.anthropic.com/v1/complete', {
+  const aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': process.env.CLAUDE_API_KEY || ''
+      'X-API-Key': process.env.CLAUDE_API_KEY || '',
+      'anthropic-version': "2023-06-01"
     },
     body: JSON.stringify({
-      prompt: `Generate code for a React project based on: ${prompt}. 
-      You can modify "package.json" to include any necessary dependencies and "index.ts" for the main entry point. 
-      Return a JSON response like this: [ { "dir": "src/components/ComponentName.js", "content": "import React...component code" }, { "dir": "package.json", "content": "updated package.json" } ]`,
-      model: 'claude-v1',
-      max_tokens_to_sample: 1000
+      messages: [
+        {"role": "user", "content": `Generate code for a React project based on: ${prompt}. 
+        You can modify "package.json" to include any necessary dependencies and "index.ts" for the main entry point. 
+        Return a JSON response like this: [ { "dir": "src/components/ComponentName.js", "content": "import React...component code" }, 
+        { "dir": "package.json", "content": "updated package.json" } ]`}
+      ],
+      model: 'claude-3-opus-20240229',
+      max_tokens: 1000
     })
   });
   const generatedFiles: FileData[] = await aiResponse.json();
