@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
-import CodeEditor from "./CodeEditor";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
+import FileTree from "./FileTree";
+
+const CodeEditor = dynamic(() => import("./CodeEditor"), { ssr: false });
+
 interface EditorModalProps {
   projectData: { dir: string; content: string; }[] | null;
   onClose: (updatedProjectData: { dir: string; content: string; }[] | null) => void;
@@ -9,7 +12,9 @@ interface EditorModalProps {
 
 const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
   const [localProjectData, setLocalProjectData] = useState(projectData);
-  const [selectedFile, setSelectedFile] = useState<{ dir: string; content: string; } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{ dir: string; content: string; } | null>(
+    projectData && projectData.length > 0 ? projectData[0] : null
+  );
 
   useEffect(() => {
     if (localProjectData && localProjectData.length > 0) {
@@ -46,6 +51,11 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
     return null;
   }
 
+  const isBinaryFile = (content: string) => {
+    // Simple check for binary content (you might want to improve this)
+    return /[\x00-\x08\x0E-\x1F]/.test(content);
+  };
+
   return (
     <motion.div
       className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
@@ -53,31 +63,44 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-     <div className="bg-white rounded-lg w-full h-full max-w-6xl flex flex-row">
-  <Sidebar
-    files={localProjectData}
-    onSelectFile={handleSelectFile}
-  />
-  <div className="flex-grow p-4 overflow-auto">
-    {selectedFile ? (
-      <CodeEditor
-        key={selectedFile?.dir}
-        fileContent={selectedFile?.content || ""}
-        onChange={handleFileChange}
-      />
-    ) : (
-      <p>Select a file to start editing</p>
-    )}
-  </div>
-</div>
-
-<button
-  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full"
-  onClick={handleClose} // Save changes on close
->
-  Close
-</button>
-
+      <div className="bg-white rounded-lg justify-between w-4/5 h-4/5 shadow-lg flex">
+        <div className="w-1/4 overflow-auto">
+          <FileTree
+            files={projectData || []}
+            onSelectFile={(file) => setSelectedFile(file)}
+          />
+        </div>
+        <div className="flex flex-col w-3/4 p-4">
+          {selectedFile && (
+            isBinaryFile(selectedFile.content) ? (
+              <div>
+                <h2>{selectedFile.dir}</h2>
+                <p>[Binary file] Contents cannot be displayed</p>
+              </div>
+            ) : (
+              <CodeEditor
+                fileContent={selectedFile.content}
+                onChange={(newContent) => {
+                  setSelectedFile({ ...selectedFile, content: newContent });
+                }}
+                filename={selectedFile.dir} // Pass the filename here
+              />
+            )
+          )}
+        </div>
+        <button
+          className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full"
+          onClick={handleClose}
+        >
+          Close
+        </button>
+      </div>
+      <button
+        className="top-2 right-2 p-2 bg-red-500 text-white rounded-full"
+        onClick={handleClose}
+      >
+        Close
+      </button>
     </motion.div>
   );
 };

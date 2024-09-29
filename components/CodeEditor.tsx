@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const CodeMirror = dynamic(
@@ -16,18 +16,38 @@ const CodeMirror = dynamic(
 interface CodeEditorProps {
   fileContent: string;
   onChange: (newContent: string) => void;
+  filename?: string; // Make filename optional
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({ fileContent, onChange }) => {
+const CodeEditor: React.FC<CodeEditorProps> = ({ fileContent, onChange, filename = '' }) => { // Provide default value
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
-    console.log("CodeEditor received new content:", fileContent);
-  }, [fileContent]);
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  const getMode = (filename: string) => {
+    if (filename.endsWith('.js') || filename.endsWith('.ts') || filename.endsWith('.jsx') || filename.endsWith('.tsx')) {
+      return 'javascript';
+    }
+    if (filename.endsWith('.css')) {
+      return 'css';
+    }
+    if (filename.endsWith('.html')) {
+      return 'htmlmixed';
+    }
+    return 'javascript'; // default
+  };
 
   return (
     <CodeMirror
       value={fileContent}
       options={{
-        mode: "javascript",
+        mode: getMode(filename),
         theme: "material",
         lineNumbers: true,
       }}
