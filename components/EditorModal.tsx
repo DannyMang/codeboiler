@@ -21,7 +21,7 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
       setSelectedFile(localProjectData[0]);
     }
   }, [localProjectData]);
-  
+
   // When selecting a file from the sidebar
   const handleSelectFile = (file: { dir: string; content: string; }) => {
     setSelectedFile(file);
@@ -32,12 +32,12 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
     if (selectedFile && localProjectData) {
       const updatedFile = { ...selectedFile, content: newContent };
       setSelectedFile(updatedFile);
-      
-      const updatedProjectData = localProjectData.map(file => 
+
+      const updatedProjectData = localProjectData.map(file =>
         file.dir === updatedFile.dir ? updatedFile : file
       );
       setLocalProjectData(updatedProjectData);
-      
+
       console.log("Updated file:", updatedFile);
       console.log("Updated project data:", updatedProjectData);
     }
@@ -73,9 +73,9 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
         <div className="flex flex-col w-3/4 p-4">
           {selectedFile && (
             isBinaryFile(selectedFile.content) ? (
-              <div>
-                <h2>{selectedFile.dir}</h2>
-                <p>[Binary file] Contents cannot be displayed</p>
+              <div className="flex flex-col items-center justify-center h-full">
+                <h2 className="text-black">{selectedFile.dir}</h2>
+                <p className="text-black">[Binary file] Contents cannot be displayed</p>
               </div>
             ) : (
               <CodeEditor
@@ -83,7 +83,7 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
                 onChange={(newContent) => {
                   setSelectedFile({ ...selectedFile, content: newContent });
                 }}
-                filename={selectedFile.dir} // Pass the filename here
+                filename={selectedFile.dir}
               />
             )
           )}
@@ -95,12 +95,6 @@ const EditorModal: React.FC<EditorModalProps> = ({ projectData, onClose }) => {
           Close
         </button>
       </div>
-      <button
-        className="top-2 right-2 p-2 bg-red-500 text-white rounded-full"
-        onClick={handleClose}
-      >
-        Close
-      </button>
     </motion.div>
   );
 };

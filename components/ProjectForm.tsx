@@ -68,9 +68,22 @@ const ProjectForm: React.FC = () => {
   return (
     <>
       {isLoading && (
-        <div className="flex flex-col w-full min-h-screen z-50 items-center justify-center fixed backdrop-blur-lg">
-          <Loader />
-        </div>
+        <motion.div
+          className="flex flex-col w-full min-h-screen z-50 items-center justify-center fixed backdrop-blur-lg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Loader className="animate-spin text-white" size={48} />
+          <motion.p
+            className="text-white mt-4 text-lg"
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+          >
+            Loading...
+          </motion.p>
+        </motion.div>
       )}
 
       <motion.div
@@ -116,7 +129,7 @@ const ProjectForm: React.FC = () => {
             {isLoading ? "Generating..." : "Generate Project"}
           </motion.button>
           <motion.button
-            onClick={()=>{signOut()}}
+            onClick={() => { signOut() }}
             className="mt-4 p-3 rounded-full text-white cursor-pointer w-full bg-gray-500 hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -181,13 +194,13 @@ const ProjectForm: React.FC = () => {
       {/* Editor Modal */}
       {showEditor && (
         <EditorModal
-        projectData={projectData}
-        onClose={(updatedProjectData) => {
-          setProjectData(updatedProjectData);
-          setShowEditor(false); // Close modal after saving changes
-        }}
-      />
-      
+          projectData={projectData}
+          onClose={(updatedProjectData) => {
+            setProjectData(updatedProjectData);
+            setShowEditor(false); // Close modal after saving changes
+          }}
+        />
+
       )}
     </>
   );
