@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       const body = req.body;
       // Implement POST logic here
       res.status(201).json({ message: 'Resource created', data: body });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       res.status(500).json({ message: 'Error creating resource' });
     }
