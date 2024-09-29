@@ -2,10 +2,18 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createGithubRepo } from '../../utils/github';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { projectData } = req.body;
+  const { projectData, accessToken } = req.body;
 
-  // Call the GitHub API to create a repository and upload files
-  const repoUrl = await createGithubRepo('YOUR_GITHUB_ACCESS_TOKEN', projectData);
+  if (!accessToken) {
+    return res.status(401).json({ error: 'GitHub access token is required' });
+  }
 
-  res.status(200).json({ repoUrl });
+  try {
+    // Call the GitHub API to create a repository and upload files
+    const repoUrl = await createGithubRepo(accessToken, projectData);
+    res.status(200).json({ repoUrl });
+  } catch (error) {
+    console.error('Error creating GitHub repository:', error);
+    res.status(500).json({ error: 'Failed to create GitHub repository' });
+  }
 }
