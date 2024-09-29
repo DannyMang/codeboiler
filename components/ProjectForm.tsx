@@ -1,85 +1,126 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const ProjectForm = () => {
-  const [prompt, setPrompt] = useState(''); // Project description prompt
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-  const [projectData, setProjectData] = useState(null); // Holds the generated project data
-  const [repoUrl, setRepoUrl] = useState(''); // Holds the GitHub repo URL after export
+  const [prompt, setPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [projectData, setProjectData] = useState(null);
+  const [repoUrl, setRepoUrl] = useState('');
 
-  // Function to handle project generation based on the user's prompt
   const handleGenerateProject = async () => {
-    setIsLoading(true); // Set loading state to true while generating the project
+    setIsLoading(true);
     try {
       const response = await fetch('/api/generateProject', {
         method: 'POST',
-        body: JSON.stringify({ prompt }), // Send the prompt to the backend
+        body: JSON.stringify({ prompt }),
         headers: { 'Content-Type': 'application/json' },
       });
-
-      const data = await response.json(); // Get the generated project data
-      setProjectData(data); // Set the project data in state for display or further actions
+      const data = await response.json();
+      setProjectData(data);
     } catch (error) {
-      console.error('Error generating project:', error); // Log any errors
+      console.error('Error generating project:', error);
     }
-    setIsLoading(false); // Set loading state back to false after completion
+    setIsLoading(false);
   };
 
-  // Function to handle exporting the generated project to GitHub
   const handleExportToGithub = async () => {
-    setIsLoading(true); // Set loading state to true while exporting
+    setIsLoading(true);
     try {
       const response = await fetch('/api/exportToGithub', {
         method: 'POST',
-        body: JSON.stringify({ projectData }), // Send project data to the export API
+        body: JSON.stringify({ projectData }),
         headers: { 'Content-Type': 'application/json' },
       });
-
-      const { repoUrl } = await response.json(); // Get the repo URL from the API response
-      setRepoUrl(repoUrl); // Set the GitHub repo URL to be displayed in the UI
+      const { repoUrl } = await response.json();
+      setRepoUrl(repoUrl);
     } catch (error) {
-      console.error('Error exporting to GitHub:', error); // Log any errors
+      console.error('Error exporting to GitHub:', error);
     }
-    setIsLoading(false); // Set loading state back to false after completion
+    setIsLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center flex-row w-full min-h-screen">
-      <div className="flex flex-col space-y-4 items-center w-1/2">
-        <h1 className="text-6xl text-white text-center">CodeBoiler</h1>
-        <h2 className="text-2xl text-white text-center">yo we boilin'</h2>
-      <input
-        type="text"
-        placeholder="Describe your project..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        className="input-prompt text-gray-300 w-full bg-transparent p-4 "
-      />
-      <button 
-        onClick={handleGenerateProject} 
-        disabled={isLoading || !prompt}
-        className=" mt-8 p-3 rounded-full text-black cursor-pointer w-1/2 bg-gray-300 "
+    <motion.div 
+      className="flex items-center justify-center flex-col w-full min-h-screen bg-gradient-to-br from-purple-600 to-blue-500"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="flex flex-col space-y-6 items-center w-full max-w-md p-8 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-lg"
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
       >
-        {isLoading ? 'Generating...' : 'Generate Project'}
-      </button>
+        <motion.h1 
+          className="text-6xl font-bold text-white text-center"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          CodeBoiler
+        </motion.h1>
+        <motion.h2 
+          className="text-2xl text-white text-center"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
+          yo we boilin'
+        </motion.h2>
+        <motion.input
+          type="text"
+          placeholder="Describe your project..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="input-prompt text-gray-800 w-full bg-white bg-opacity-50 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 transition"
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+        />
+        <motion.button 
+          onClick={handleGenerateProject} 
+          disabled={isLoading || !prompt}
+          className="mt-4 p-3 rounded-full text-white cursor-pointer w-full bg-purple-500 hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.5 }}
+        >
+          {isLoading ? 'Generating...' : 'Generate Project'}
+        </motion.button>
+      </motion.div>
 
-      </div>
-
-      {/* Display the export button only if projectData is available */}
       {projectData && (
-        <div className="export-section">
-          <button onClick={handleExportToGithub} className="export-btn">
+        <motion.div 
+          className="export-section mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.button 
+            onClick={handleExportToGithub} 
+            className="export-btn bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition duration-300 ease-in-out"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Export to GitHub
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
 
-      {/* Display the GitHub repo URL once it's available */}
       {repoUrl && (
-        <div className="repo-section">
-          <p>Repository created: <a href={repoUrl} target="_blank" rel="noopener noreferrer">{repoUrl}</a></p>
-        </div>
+        <motion.div 
+          className="repo-section mt-4 text-white"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <p>Repository created: <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-100 transition">{repoUrl}</a></p>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
