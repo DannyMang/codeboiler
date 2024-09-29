@@ -1,6 +1,5 @@
-import { Send } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface ProjectData {
@@ -10,12 +9,11 @@ interface ProjectData {
 
 const ProjectForm: React.FC = () => {
   const { data: session } = useSession(); // Call useSession once at the top
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [repoUrl, setRepoUrl] = useState('');
+  const accessToken = session.accessToken;
 
   const handleGenerateProject = async () => {
     setIsLoading(true);
@@ -36,22 +34,19 @@ const ProjectForm: React.FC = () => {
   const handleExportToGithub = async () => {
     setIsLoading(true);
 
-    // Check if user is signed in
-    if (!user) {
-      console.error('User is not signed in');
+    if (!accessToken) {
+      console.error('No access token available');
       setIsLoading(false);
       return;
     }
 
     try {
-      // Get the access token for GitHub
-      const accessToken = await getToken({ template: 'github' }); // Assuming 'github' is the template you use for GitHub access
-
       const response = await fetch('/api/exportToGithub', {
         method: 'POST',
         body: JSON.stringify({ projectData, accessToken }),
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`, // Use session here
         },
       });
 
@@ -63,10 +58,6 @@ const ProjectForm: React.FC = () => {
 
     setIsLoading(false);
   };
-
-  if (!user) {
-    return <div>Please sign in to use the project generator.</div>; // Prompt to sign in
-  }
 
   return (
     <motion.div 

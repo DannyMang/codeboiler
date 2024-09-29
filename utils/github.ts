@@ -1,18 +1,13 @@
 import fetch from 'node-fetch';
 
 interface ProjectFile {
-  dir: string; // File path (e.g., 'src/index.ts')
+  dir: string; // File path (e.g., 'src/app.tsx')
   content: string; // File content
-}
-
-interface ProjectData {
-  name: string; // Repository name
-  files: ProjectFile[]; // Array of files to be uploaded
 }
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
-export async function createGithubRepo(accessToken: string, projectData: ProjectData): Promise<string> {
+export async function createGithubRepo(accessToken: string, projectFiles: ProjectFile[], repoName: string): Promise<string> {
   // Step 1: Create a new GitHub repository
   const repoResponse = await fetch(`${GITHUB_API_BASE}/user/repos`, {
     method: 'POST',
@@ -21,7 +16,7 @@ export async function createGithubRepo(accessToken: string, projectData: Project
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: projectData.name,
+      name: repoName, // Use the provided repo name
       private: false, // Set to 'true' if you want private repos
       auto_init: false, // We'll upload our own files
     }),
@@ -33,11 +28,11 @@ export async function createGithubRepo(accessToken: string, projectData: Project
   }
 
   const repoUrl = repoJson.html_url;
-  const repoName = repoJson.full_name;
+  const repoFullName = repoJson.full_name;
 
   // Step 2: Upload files to the newly created repository
-  for (const file of projectData.files) {
-    await uploadFileToGithubRepo(accessToken, repoName, file.dir, file.content);
+  for (const file of projectFiles) {
+    await uploadFileToGithubRepo(accessToken, repoFullName, file.dir, file.content);
   }
 
   // Step 3: Return the repository URL
