@@ -3,12 +3,6 @@ import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const ProjectForm = () => {
-  const [prompt, setPrompt] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [projectData, setProjectData] = useState(null);
-  const [repoUrl, setRepoUrl] = useState('');
-
 interface Message {
   text: string;
   sender: 'user' | 'ai';
