@@ -1,12 +1,6 @@
-import { Send } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-
-interface Message {
-  text: string;
-  sender: 'user' | 'ai';
-}
 
 interface ProjectData {
   name: string;
@@ -15,29 +9,10 @@ interface ProjectData {
 
 const ProjectForm: React.FC = () => {
   const { data: session } = useSession(); // Call useSession once at the top
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [repoUrl, setRepoUrl] = useState('');
-
-  const handleSendMessage = () => {
-    if (input.trim()) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, sender: 'user' },
-      ]);
-      setInput('');
-      // Simulate AI response (replace with actual API call)
-      setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: 'This is a simulated AI response.', sender: 'ai' },
-        ]);
-      }, 1000);
-    }
-  };
 
   const handleGenerateProject = async () => {
     setIsLoading(true);
